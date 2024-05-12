@@ -1,0 +1,18 @@
+@use "../../ColorPalette.scss" as *;
+
+.card-container {
+  width: 20svw;
+  height: fit-content;
+  background-color: $mixed-100;
+
+  border: 3px solid $secondary-text;
+//   padding: 2rem;
+
+  &:has(.card.dragging) {
+    cursor: grabbing;
+
+    & .card {
+      cursor: grabbing;
+    }
+  }
+}

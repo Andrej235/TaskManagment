@@ -1,0 +1,41 @@
+@use "../../ColorPalette.scss" as *;
+
+.card-holder {
+  width: 20svw;
+  height: fit-content;
+  background-color: $mixed-100;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  border: 3px solid $secondary-text;
+  padding: 2rem;
+
+  &:has(.card.dragging) {
+    cursor: grabbing;
+
+    & .card {
+      cursor: grabbing;
+    }
+  }
+}
+
+#movable-card {
+  position: absolute;
+
+  user-select: none;
+  $padding: 1.5rem;
+  padding: $padding;
+  width: calc(20svw - 2 * $padding);
+  height: fit-content;
+
+  background-color: $mixed-200;
+  border: 1px solid $secondary-text;
+
+  border-radius: 10px;
+  pointer-events: none;
+  opacity: 0;
+}

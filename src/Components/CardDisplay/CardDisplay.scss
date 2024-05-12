@@ -1,0 +1,22 @@
+@use "../../ColorPalette.scss" as *;
+
+.card {
+  position: relative;
+
+  user-select: none;
+  $padding: 1.5rem;
+  padding: $padding;
+  width: calc(100% - 2 * $padding);
+  height: fit-content;
+
+  background-color: $mixed-200;
+  border: 1px solid $secondary-text;
+
+  border-radius: 10px;
+  cursor: grab;
+
+  &.dragging {
+    pointer-events: none;
+    opacity: 0;
+  }
+}
