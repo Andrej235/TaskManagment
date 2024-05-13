@@ -16,7 +16,7 @@
   cursor: grab;
 
   &.dragging {
-    pointer-events: none;
+    // pointer-events: none;
     opacity: 0;
   }
 }

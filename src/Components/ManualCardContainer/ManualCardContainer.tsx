@@ -1,5 +1,5 @@
 import "./ManualCardContainer.scss";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "../Card";
 import CardDisplay from "../CardDisplay/CardDisplay";
 import { useGSAP } from "@gsap/react";
@@ -12,6 +12,10 @@ interface ManualCardContainerProps {
 export default function ManualCardContainer({
   cards,
 }: ManualCardContainerProps) {
+  const [movableCardContent, setMovableCardContent] = useState<string>("");
+  const movableCardRef = useRef<HTMLDivElement>(null);
+  const isDraggingAvailable = useRef<boolean>(true);
+
   const cardHolderRef = useRef<HTMLDivElement>(null);
   const draggingCard = useRef<{
     card: Card;
@@ -61,8 +65,9 @@ export default function ManualCardContainer({
           )!;
           const currentCardRect = currentCardRef.getBoundingClientRect();
 
-          gsap.set(currentCardRef, {
+          gsap.to(currentCardRef, {
             y: `+=${y - (currentCardRect.y - card2Rect.y)}`,
+            duration: 0.2,
           });
 
           y += currentCardRect.height;
@@ -84,8 +89,9 @@ export default function ManualCardContainer({
           )!;
           const currentCardRect = currentCardRef.getBoundingClientRect();
 
-          gsap.set(currentCardRef, {
+          gsap.to(currentCardRef, {
             y: `+=${y - (currentCardRect.y - card1Rect.y)}`,
+            duration: 0.2,
           });
 
           y += currentCardRect.height;
@@ -126,43 +132,92 @@ export default function ManualCardContainer({
     return newArray;
   }
 
+  const setMovableCardTranslation = contextSafe((x: number, y: number) => {
+    gsap.set(movableCardRef.current, {
+      x: `+=${x}`,
+      y: `+=${y}`,
+    });
+  });
+
+  const startDragging = contextSafe(
+    (x: number, y: number, ref: HTMLDivElement, card: Card) => {
+      console.log("start");
+      if (isDraggingAvailable.current) return;
+      isDraggingAvailable.current = true;
+
+      setMovableCardContent(card.text);
+      gsap.set(movableCardRef.current, {
+        left: x,
+        top: y,
+        opacity: 1,
+      });
+
+      ref.classList.add("dragging");
+      draggingCard.current = {
+        card,
+        ref,
+      };
+    }
+  );
+
+  const finishDragging = contextSafe(
+    (x: number, y: number, ref: HTMLDivElement) => {
+      draggingCard.current = null;
+
+      gsap.to(movableCardRef.current, {
+        x: 0,
+        y: 0,
+        left: x,
+        top: y,
+        duration: 0.25,
+        onComplete: () => {
+          console.log("end");
+          movableCardRef.current!.style.opacity = "0";
+          ref.classList.remove("dragging");
+          isDraggingAvailable.current = false;
+        },
+      });
+    }
+  );
+
   return (
-    <div className="card-container" ref={cardHolderRef}>
-      {cards.map((x) => {
-        return (
-          <CardDisplay
-            id={`card-${x.id}`}
-            key={`card-${x.id}`}
-            onDragStart={(_, ref) => {
-              draggingCard.current = {
-                card: x,
-                ref,
-              };
-            }}
-            onDragEnd={() => {
-              draggingCard.current = null;
-            }}
-            onMouseOver={(e) => {
-              if (!draggingCard.current) return;
-              const target = e.target as HTMLDivElement;
+    <div>
+      <div className="card-container" ref={cardHolderRef}>
+        {cards.map((x) => {
+          return (
+            <CardDisplay
+              id={`card-${x.id}`}
+              key={`card-${x.id}`}
+              onDragStart={(rect, ref) => {
+                startDragging(rect.x, rect.y, ref, x);
+              }}
+              onDragEnd={(rect, ref) => {
+                finishDragging(rect.x, rect.y, ref);
+              }}
+              onDrag={setMovableCardTranslation}
+              onMouseOver={(e) => {
+                if (!draggingCard.current) return;
 
-              if (target === draggingCard.current?.ref) {
-                console.log("same");
-                return;
-              }
+                const target = e.target as HTMLDivElement;
+                if (target === draggingCard.current?.ref) return;
 
-              swapPlaces(
-                draggingCard.current.card,
-                draggingCard.current.ref,
-                x,
-                target
-              );
-            }}
-          >
-            {x.text}
-          </CardDisplay>
-        );
-      })}
+                swapPlaces(
+                  draggingCard.current.card,
+                  draggingCard.current.ref,
+                  x,
+                  target
+                );
+              }}
+            >
+              {x.text}
+            </CardDisplay>
+          );
+        })}
+      </div>
+
+      <div className="card" ref={movableCardRef} id="movable-card">
+        {movableCardContent}
+      </div>
     </div>
   );
 }

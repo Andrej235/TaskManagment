@@ -6,7 +6,7 @@
   background-color: $mixed-100;
 
   border: 3px solid $secondary-text;
-//   padding: 2rem;
+  //   padding: 2rem;
 
   &:has(.card.dragging) {
     cursor: grabbing;
@@ -15,4 +15,21 @@
       cursor: grabbing;
     }
   }
+}
+
+#movable-card {
+  position: absolute;
+
+  user-select: none;
+  $padding: 1.5rem;
+  padding: $padding;
+  width: calc(20svw - 2 * $padding);
+  height: fit-content;
+
+  background-color: $mixed-200;
+  border: 1px solid $secondary-text;
+
+  border-radius: 10px;
+  pointer-events: none;
+  opacity: 0;
 }
