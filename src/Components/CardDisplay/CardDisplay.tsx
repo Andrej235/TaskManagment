@@ -30,20 +30,24 @@ export default function CardDisplay({
       target: cardDisplayRef.current,
       type: "touch,pointer",
       onDragStart: () => {
+        console.log('start');
         onDragStart?.(
           cardDisplayRef.current!.getBoundingClientRect(),
           cardDisplayRef.current!
         );
       },
       onDragEnd: () => {
+        console.log('end');
         onDragEnd?.(
           cardDisplayRef.current!.getBoundingClientRect(),
           cardDisplayRef.current!
         );
       },
       onDrag: (x) => {
+        console.log("onDrag");
         onDrag?.(x.deltaX, x.deltaY);
       },
+      preventDefault: true,
     });
 
     return () => observer.kill();

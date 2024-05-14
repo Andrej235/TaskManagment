@@ -133,6 +133,7 @@ export default function ManualCardContainer({
   }
 
   const setMovableCardTranslation = contextSafe((x: number, y: number) => {
+    console.log("set translation", x, y);
     gsap.set(movableCardRef.current, {
       x: `+=${x}`,
       y: `+=${y}`,
@@ -141,12 +142,14 @@ export default function ManualCardContainer({
 
   const startDragging = contextSafe(
     (x: number, y: number, ref: HTMLDivElement, card: Card) => {
-      console.log("start");
-      if (isDraggingAvailable.current) return;
-      isDraggingAvailable.current = true;
+      if (!isDraggingAvailable.current) return;
+      isDraggingAvailable.current = false;
 
+      console.log("start");
       setMovableCardContent(card.text);
       gsap.set(movableCardRef.current, {
+        x: 0,
+        y: 0,
         left: x,
         top: y,
         opacity: 1,
@@ -172,9 +175,9 @@ export default function ManualCardContainer({
         duration: 0.25,
         onComplete: () => {
           console.log("end");
-          movableCardRef.current!.style.opacity = "0";
+          // movableCardRef.current!.style.opacity = "0";
           ref.classList.remove("dragging");
-          isDraggingAvailable.current = false;
+          isDraggingAvailable.current = true;
         },
       });
     }
